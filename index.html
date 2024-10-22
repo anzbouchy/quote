@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Quotes!</title>
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <main>
+      <h1>Anwar's Quote Gen</h1>
+      <form action="">
+        <br />
+        <h3 for="name">who do u want a quote from?:</h3>
+
+        <input type="text" name="message" id="message" />
+        <button type="submit">Send</button>
+      </form>
+      <div id="chat-log"></div>
+    </main>
+    <script>
+      const chatLog = document.getElementById("chat-log");
+      const message = document.getElementById("message");
+      const form = document.querySelector("form");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const messageText = message.value;
+        message.value = "";
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message");
+        messageElement.classList.add("message--sent");
+        messageElement.innerHTML = `<div class = "message__text">${messageText}</div>`;
+
+        chatLog.appendChild(messageElement);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        fetch("http://localhost:3000", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: messageText,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const messageElement = document.createElement("div");
+            const responseMessage = data.completion;
+            messageElement.classList.add("message");
+            messageElement.classList.add("message--received");
+            messageElement.innerHTML = `<div class = "message__text">${responseMessage}</div>`;
+            chatLog.appendChild(messageElement);
+            chatLog.scrollTop = chatLog.scrollHeight;
+            if (chatLog.children.length > 2) {
+              chatLog.removeChild(chatLog.children[0]);
+              chatLog.removeChild(chatLog.children[0]);
+            }
+          });
+      });
+    </script>
+  </body>
+</html>
